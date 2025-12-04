@@ -11,6 +11,10 @@ app.get("/", (req, res) => {
         title: "bunga riki",
         harga: 20000,
       },
+      {
+        title: "bunga riyyad",
+        harga: 30000,
+      }
     ],
   });
 });
