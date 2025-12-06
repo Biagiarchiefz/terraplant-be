@@ -1,7 +1,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import { prisma } from "./config/prismaConfig.js";
+// import { prisma } from "./config/prismaConfig.js";
+import { authRoute } from "./routes/authRoutes_TEMP.js";
 
 dotenv.config();
 const app = express();
@@ -26,3 +27,6 @@ app.get("/", (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+app.use("/api/auth", authRoute);
