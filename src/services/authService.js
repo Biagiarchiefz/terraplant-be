@@ -1,6 +1,6 @@
 import { prisma } from "../config/prismaConfig.js";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+
 
 export const registerService = async (data) => {
   const { nama, email, password } = data;
@@ -10,6 +10,7 @@ export const registerService = async (data) => {
   // jik email sudah terdaftar throw error
   if (exists) throw new Error("Email sudah terdaftar");
 
+  // bcrypt handle password
   const hashed = await bcrypt.hash(password, 10);
 
   const user = await prisma.user.create({
