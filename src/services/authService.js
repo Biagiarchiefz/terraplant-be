@@ -23,3 +23,25 @@ export const registerService = async (data) => {
 
   return user;
 };
+
+
+export const loginService = async (data) => {
+  const { email, password } = data;
+
+  // mengembalikan satu data user
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) throw new Error("User tidak ditemukan");
+
+  const isValid = await bcrypt.compare(password, user.password);
+
+  if (!isValid) throw new Error("Password tidak valid");
+
+  const token = generateToken(user);
+
+  return { user, token };
+};
