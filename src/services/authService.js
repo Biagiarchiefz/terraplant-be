@@ -1,12 +1,18 @@
 import { prisma } from "../config/prismaConfig.js";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/jwt.js";
 
 
 export const registerService = async (data) => {
   const { nama, email, password } = data;
 
   // cek ke db apakah email sudah terdaftar
-  const exists = await prisma.user.findUnique({ where: { email } });
+  const exists = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
   // jik email sudah terdaftar throw error
   if (exists) throw new Error("Email sudah terdaftar");
 
@@ -23,3 +29,44 @@ export const registerService = async (data) => {
 
   return user;
 };
+
+
+export const loginService = async (data) => {
+  const { email, password } = data;
+
+  // mengembalikan satu data user
+  const user = await prisma.user.findUnique({
+    where: {
+      email: email,
+    },
+  });
+
+  if (!user) throw new Error("User tidak ditemukan");
+
+  const isValid = await bcrypt.compare(password, user.password);
+
+  if (!isValid) throw new Error("Password tidak valid");
+
+  const token = generateToken(user);
+
+  return { user, token };
+};
+
+
+export const profileService = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {    // menagtur data yang ingin di tampilkan dari tabel user
+      id: true,
+      nama: true,
+      email: true,
+      role: true,
+      created_at: true,
+    }
+  })
+
+  return user
+
+} 
