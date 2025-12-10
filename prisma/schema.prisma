@@ -30,3 +30,19 @@ enum Role {
   admin
   user
 }
+
+
+model Plant {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  nama             String
+  slug             String   @unique
+  harga            Int
+  deskripsi        String
+  kategori         String
+  stok             Int
+  rating           Float?   @default(0)
+  gambar           String[] // list URL gambar
+  created_at       DateTime @default(now())
+  updated_at       DateTime @updatedAt
+}
+
