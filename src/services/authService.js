@@ -46,3 +46,22 @@ export const loginService = async (data) => {
 
   return { user, token };
 };
+
+
+export const profileService = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      // menagtur data yang ingin di tampilkan dari tabel user
+      id: true,
+      nama: true,
+      email: true,
+      role: true,
+      created_at: true,
+    },
+  });
+
+  return user;
+};
