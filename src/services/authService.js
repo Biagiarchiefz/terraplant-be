@@ -1,5 +1,6 @@
 import { prisma } from "../config/prismaConfig.js";
 import bcrypt from "bcryptjs";
+import { generateToken } from "../utils/jwt.js";
 
 
 export const registerService = async (data) => {
@@ -44,4 +45,23 @@ export const loginService = async (data) => {
   const token = generateToken(user);
 
   return { user, token };
+};
+
+
+export const profileService = async (userId) => {
+  const user = await prisma.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      // menagtur data yang ingin di tampilkan dari tabel user
+      id: true,
+      nama: true,
+      email: true,
+      role: true,
+      created_at: true,
+    },
+  });
+
+  return user;
 };
