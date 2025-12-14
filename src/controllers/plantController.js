@@ -1,14 +1,12 @@
 import { createPlant, deletePlant, getAllPlants, getPlantById, updatePlant } from "../services/plantService.js";
 
-
 export const getAll = async (req, res) => {
   try {
     const data = await getAllPlants();
     res.json({
       message: "Berhasil mengambil semua data tanaman",
-       data: data
-      }
-    );
+      data: data,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -41,12 +39,10 @@ export const create = async (req, res) => {
 export const update = async (req, res) => {
   try {
     const data = await updatePlant(req.params.id, req.body);
-    res.json(
-      {
-        message: "Tanaman berhasil diperbarui",
-        data: data,
-      }
-    );
+    res.json({
+      message: "Tanaman berhasil diperbarui",
+      data: data,
+    });
   } catch (err) {
     res.status(400).json({ message: err.message });
   }
@@ -55,8 +51,8 @@ export const update = async (req, res) => {
 export const remove = async (req, res) => {
   try {
     await deletePlant(req.params.id);
-    res.json({ 
-      message: "Tanaman berhasil dihapus" 
+    res.json({
+      message: "Tanaman berhasil dihapus",
     });
   } catch (err) {
     res.status(400).json({ message: err.message });

@@ -1,0 +1,58 @@
+tags:
+  - name: Auth
+    description: Authentication API
+
+paths:
+  /api/auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Register user baru
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: biagi@email.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        201:
+          description: User berhasil dibuat
+        400:
+          description: Validasi gagal
+
+  /api/auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Login user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  example: biagi@email.com
+                password:
+                  type: string
+                  example: password123
+      responses:
+        200:
+          description: Login berhasil
+        401:
+          description: Email atau password salah

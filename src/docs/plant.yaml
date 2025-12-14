@@ -1,0 +1,6 @@
+paths:
+  /ping:
+    get:
+      summary: Test Swagger
+      responses:
+        200:  description: OK
