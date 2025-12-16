@@ -5,7 +5,7 @@ import { create, getAll, getById, remove, update } from "../controllers/plantCon
 
 const router = express.Router();
 
-router.get("/", authMiddleware, getAll);
+router.get("/", getAll);
 router.get("/:id", authMiddleware, getById);
 router.post("/", authMiddleware, create);
 router.put("/:id", authMiddleware, update);
