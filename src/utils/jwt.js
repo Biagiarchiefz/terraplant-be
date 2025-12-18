@@ -8,7 +8,7 @@ export const generateToken = (user) => {
       role: user.role,
     },
     process.env.JWT_SECRET,
-    { expiresIn: "1h" }  // token valid selama 1 jam
+    { expiresIn: "1d" }  // token valid selama 1 hari
   );
 
   return token;
