@@ -1,5 +1,4 @@
-
-{  
+{
   "name": "terraplant-backend",
   "version": "1.0.0",
   "type": "module",
@@ -22,6 +21,8 @@
     "express": "^4.22.1",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^9.0.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "yup": "^1.7.1"
   },
   "devDependencies": {

@@ -54,7 +54,7 @@ export const profileService = async (userId) => {
       id: userId,
     },
     select: {
-      // menagtur data yang ingin di tampilkan dari tabel user
+      // mengatur data yang ingin di tampilkan dari tabel user
       id: true,
       nama: true,
       email: true,
