@@ -5,7 +5,7 @@ import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./docs/swagger.js";
 // import { prisma } from "./config/prismaConfig.js";
 import { authRoute } from "./routes/authRoute.js";
-import  plantRoute  from "./routes/plantRoute.js";
+import { plantRoute } from "./routes/plantRoute.js";
 
 dotenv.config();
 const app = express();
