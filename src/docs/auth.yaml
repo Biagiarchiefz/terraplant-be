@@ -15,15 +15,24 @@ paths:
             schema:
               type: object
               required:
+                - nama
                 - email
                 - password
+                - confirmPassword
               properties:
+                nama:
+                  type: string
+                  example: marchiko
                 email:
                   type: string
-                  example: biagi@email.com
+                  example: marchiko@email.com
                 password:
                   type: string
                   example: password123
+                confirmPassword:
+                  type: string
+                  example: password123
+
       responses:
         201:
           description: User berhasil dibuat
@@ -47,7 +56,7 @@ paths:
               properties:
                 email:
                   type: string
-                  example: biagi@email.com
+                  example: marchiko@email.com
                 password:
                   type: string
                   example: password123
@@ -56,3 +65,53 @@ paths:
           description: Login berhasil
         401:
           description: Email atau password salah
+
+  /api/auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Get profile user
+      description: Mengembalikan data profil user berdasarkan token JWT yang dikirim di header Authorization.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Profil user berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "success get profile user"
+        401:
+          description: invalid token
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 6938f9e0b3a80839bf8b8adb
+        nama:
+          type: string
+          example: marchiko
+        email:
+          type: string
+          example: marchiko@email.com
+        role:
+          type: string
+          example: user
+        created_at:
+          type: string
+          format: date-time
+          example: 2025-12-10T04:41:04.757Z
+
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
