@@ -46,3 +46,35 @@ model Plant {
   updated_at       DateTime @updatedAt
 }
 
+model Cart {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  plantId    String   @db.ObjectId
+  qty        Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Order {
+  id         String      @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String      @db.ObjectId
+  totalHarga Int
+  status     OrderStatus
+  created_at DateTime    @default(now())
+}
+
+enum OrderStatus {
+  pending
+  paid
+  completed
+  canceled
+}
+
+model OrderItem {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String @db.ObjectId
+  plantId String @db.ObjectId
+  nama    String
+  harga   Int
+  qty     Int
+}
