@@ -31,18 +31,60 @@ enum Role {
   user
 }
 
-
 model Plant {
-  id               String   @id @default(auto()) @map("_id") @db.ObjectId
-  nama             String
-  slug             String   @unique
-  harga            Int
-  deskripsi        String
-  kategori         String
-  stok             Int
-  rating           Float?   @default(0)
-  gambar           String[] // list URL gambar
-  created_at       DateTime @default(now())
-  updated_at       DateTime @updatedAt
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  nama       String
+  slug       String   @unique
+  harga      Int
+  deskripsi  String
+  kategori   String
+  stok       Int
+  rating     Float?   @default(0)
+  gambar     String[] // list URL gambar
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
 }
 
+model Cart {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String   @db.ObjectId
+  plantId    String   @db.ObjectId
+  qty        Int
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+}
+
+model Order {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String   @db.ObjectId
+
+  fullName    String
+  address     String
+  city        String
+  state       String
+  zipCode     String
+  phone       String
+
+  paymentMethod String
+  status      OrderStatus
+  totalHarga  Int
+
+  created_at  DateTime @default(now())
+}
+
+
+enum OrderStatus {
+  pending
+  paid
+  canceled
+}
+
+
+model OrderItem {
+  id      String @id @default(auto()) @map("_id") @db.ObjectId
+  orderId String @db.ObjectId
+  plantId String @db.ObjectId
+  nama    String
+  harga   Int
+  qty     Int
+}
