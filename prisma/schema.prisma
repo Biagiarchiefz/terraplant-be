@@ -74,9 +74,11 @@ model Order {
 
 
 enum OrderStatus {
-  pending
-  paid
-  canceled
+  pembayaran   // user baru checkout
+  diproses     // admin konfirmasi
+  dikirim      // admin kirim barang
+  selesai      // user konfirmasi terima
+  dibatalkan
 }
 
 
@@ -87,4 +89,5 @@ model OrderItem {
   nama    String
   harga   Int
   qty     Int
+  gambar String
 }
