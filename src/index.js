@@ -8,6 +8,7 @@ import { authRoute } from "./routes/authRoute.js";
 import { plantRoute } from "./routes/plantRoute.js";
 import { cartRoute } from "./routes/cartRoute.js";
 import { checkoutRoute } from "./routes/checkoutRoute.js";
+import { orderRoute } from "./routes/orderRoute.js";
 
 dotenv.config();
 const app = express();
@@ -35,3 +36,4 @@ app.use("/api/auth", authRoute);
 app.use("/api/plants", plantRoute);
 app.use("/api/cart", cartRoute);
 app.use("/api/checkout", checkoutRoute);
+app.use("/api/orders", orderRoute);
