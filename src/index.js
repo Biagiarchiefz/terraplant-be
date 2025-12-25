@@ -7,6 +7,7 @@ import { swaggerSpec } from "./docs/swagger.js";
 import { authRoute } from "./routes/authRoute.js";
 import { plantRoute } from "./routes/plantRoute.js";
 import { cartRoute } from "./routes/cartRoute.js";
+import { checkoutRoute } from "./routes/checkoutRoute.js";
 
 dotenv.config();
 const app = express();
@@ -33,3 +34,4 @@ app.listen(port, () => {
 app.use("/api/auth", authRoute);
 app.use("/api/plants", plantRoute);
 app.use("/api/cart", cartRoute);
+app.use("/api/checkout", checkoutRoute);
