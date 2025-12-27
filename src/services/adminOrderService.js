@@ -66,3 +66,44 @@ export const getAllOrdersForAdmin = async () => {
     status: order.status,
   }));
 };
+
+export const getOrderDetailForAdmin = async (orderId) => {
+  // 1. Ambil data order
+  const order = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!order) {
+    throw new Error("Order tidak ditemukan");
+  }
+
+  // 2. Ambil semua order items
+  const items = await prisma.orderItem.findMany({
+    where: { orderId: orderId },
+  });
+
+  // 3. Shape data detail order (konsisten dengan getOrderDetail)
+  return {
+    id: order.id,
+    status: order.status,
+    created_at: order.created_at,
+    paymentMethod: order.paymentMethod,
+    shipping: {
+      fullName: order.fullName,
+      phone: order.phone,
+      address: `${order.address}, ${order.city}, ${order.state} ${order.zipCode}`,
+      courier: {
+        name: "JNE Regular", // Dummy courier
+        resi: `RESI${orderId.slice(-8).toUpperCase()}`, // Dummy resi
+        estimate: "2-3 hari", // Dummy estimation
+      },
+    },
+    items,
+    summary: {
+      subtotal: order.totalHarga,
+      ongkir: 8000, // Dummy ongkir
+      diskonOngkir: 8000,
+      total: order.totalHarga,
+    },
+  };
+};
