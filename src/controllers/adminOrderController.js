@@ -1,5 +1,6 @@
 import {
   getAllOrdersForAdmin,
+  getOrderDetailForAdmin,
   updateStatusOrder,
 } from "../services/adminOrderService.js";
 
@@ -36,6 +37,22 @@ export const getAdminOrders = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Gagal mengambil data order",
+    });
+  }
+};
+
+export const getOrderDetail = async (req, res) => {
+  const orderId = req.params.id;
+
+  try {
+    const orderDetail = await getOrderDetailForAdmin(orderId);
+    res.status(200).json({
+      message: "berhasil mengambil detail order user",
+      data: orderDetail,
+    });
+  } catch (error) {
+    res.status(404).json({
+      message: error.message || "Gagal mengambil detail order",
     });
   }
 };
