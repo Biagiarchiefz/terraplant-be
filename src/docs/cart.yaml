@@ -1,0 +1,199 @@
+tags:
+  - name: Cart
+    description: Cart Management API
+
+paths:
+  /api/cart/add:
+    post:
+      tags:
+        - Cart
+      summary: Menambahkan Tanaman ke Keranjang
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CartInput"
+      responses:
+        200:
+          description: Add cart success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "add cart success"
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        400:
+          description: Bad Request / Kesalahan input
+
+  /api/cart/{userId}:
+    get:
+      tags:
+        - Cart
+      summary: Ambil semua isi keranjang milik user
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "user_id_123"
+      responses:
+        200:
+          description: Get cart success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "get cart success"
+                  data:
+                    $ref: "#/components/schemas/CartResponse"
+        400:
+          description: Bad Request
+
+  /api/cart/{id}:
+    put:
+      tags:
+        - Cart
+      summary: Memperbarui jumlah (qty) di keranjang
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID dari item di keranjang
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                qty:
+                  type: integer
+                  example: 5
+      responses:
+        200:
+          description: Update cart success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "update cart success"
+                  data:
+                    $ref: "#/components/schemas/Cart"
+        404:
+          description: Item cart tidak ditemukan
+
+    delete:
+      tags:
+        - Cart
+      summary: Menghapus item dari keranjang
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Item berhasil dihapus dari cart
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "item berhasil dihapus dari cart"
+        500:
+          description: Internal Server Error
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    CartInput:
+      type: object
+      required:
+        - plantId
+        - qty
+      properties:
+        plantId:
+          type: string
+          example: "contoh123"
+        qty:
+          type: integer
+          example: 2
+
+    Cart:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cartid01"
+        userId:
+          type: string
+          example: "userid123"
+        plantId:
+          type: string
+          example: "plantidabc"
+        qty:
+          type: integer
+          example: 2
+
+    CartItemDetail:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "cartid01"
+        plantId:
+          type: string
+          example: "plantidabc"
+        nama:
+          type: string
+          example: "Monstera"
+        harga:
+          type: integer
+          example: 50000
+        qty:
+          type: integer
+          example: 2
+        total:
+          type: integer
+          example: 100000
+
+    CartResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/CartItemDetail"
+        grandTotal:
+          type: integer
+          example: 100000
