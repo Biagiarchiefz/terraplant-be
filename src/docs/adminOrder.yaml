@@ -1,0 +1,128 @@
+tags:
+  - name: Admin Order
+    description: API Manajemen Pesanan khusus Admin
+
+paths:
+  /api/admin/orders:
+    get:
+      tags:
+        - Admin Order
+      summary: Ambil semua data pesanan (Admin Only)
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Berhasil mengambil data order
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/AdminOrderResponse"
+        401:
+          description: Unauthorized (Token tidak valid)
+        403:
+          description: Access denied (Bukan admin)
+        500:
+          description: Gagal mengambil data order
+
+  /api/admin/orders/{id}/status:
+    patch:
+      tags:
+        - Admin Order
+      summary: Memperbarui status pesanan
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID Pesanan (Order ID)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - status
+              properties:
+                status:
+                  type: string
+                  enum: [diproses, dikirim]
+                  example: "dikirim"
+      responses:
+        200:
+          description: Status berhasil diubah
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "status berhasil diubah"
+                  data:
+                    $ref: "#/components/schemas/Order"
+        400:
+          description: Status tidak valid atau bad request
+        403:
+          description: Access denied. Admin only.
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AdminOrderResponse:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: "ord-12345"
+        customer:
+          type: string
+          example: "Budi Santoso"
+        date:
+          type: string
+          format: date-time
+          example: "2023-10-27T10:00:00Z"
+        total:
+          type: integer
+          example: 150000
+        itemCount:
+          type: integer
+          example: 3
+        status:
+          type: string
+          example: "diproses"
+
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "ord-12345"
+        userId:
+          type: string
+          example: "user-99"
+        totalHarga:
+          type: integer
+          example: 150000
+        status:
+          type: string
+          example: "dikirim"
+        created_at:
+          type: string
+          format: date-time
