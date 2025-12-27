@@ -1,4 +1,4 @@
-import { addCart } from "../services/cartService.js";
+import { addCart, deleteItemCart, getCartById, updateCart } from "../services/cartService.js";
 
 export const add = async (req, res) => {
   const userId = req.user.id;
