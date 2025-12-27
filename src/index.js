@@ -37,7 +37,7 @@ app.listen(port, () => {
 
 app.use("/api/auth", authRoute);
 app.use("/api/plants", plantRoute);
-app.use("/api/cart", cartRoute);
+// app.use("/api/cart", cartRoute);
 app.use("/api/checkout", checkoutRoute);
 app.use("/api/orders", orderRoute);
 
