@@ -1,4 +1,5 @@
-import {prisma} from "../config/prismaConfig.js";
+import { prisma } from "../config/prismaConfig.js";
+import { generateUniqueSlug } from "../utils/slug.js";
 
 export const getAllPlants = async () => {
   return await prisma.plant.findMany();
@@ -11,8 +12,8 @@ export const getPlantById = async (id) => {
 };
 
 export const createPlant = async (data) => {
-
-  const {nama, slug, harga, deskripsi, kategori, stok, gambar} = data;
+  const { nama, harga, deskripsi, kategori, stok, gambar } = data;
+  const slug = await generateUniqueSlug(nama);
 
   return await prisma.plant.create({
     data: {
@@ -22,14 +23,14 @@ export const createPlant = async (data) => {
       deskripsi: deskripsi,
       kategori: kategori,
       stok: parseInt(stok),
-      // rating: data.rating ? parseFloat(data.rating) : 0,
       gambar: Array.isArray(gambar) ? gambar : [],
     },
   });
 };
 
 export const updatePlant = async (id, data) => {
-  const {nama, slug, harga, deskripsi, kategori, stok,  rating ,gambar} = data;
+  const { nama, harga, deskripsi, kategori, stok, rating, gambar } = data;
+  const slug = await generateUniqueSlug(nama);
   return await prisma.plant.update({
     where: { id },
     data: {
@@ -39,7 +40,6 @@ export const updatePlant = async (id, data) => {
       deskripsi: deskripsi,
       kategori: kategori,
       stok: parseInt(stok),
-      rating: rating ? parseFloat(rating) : 0,
       gambar: Array.isArray(gambar) ? gambar : [],
     },
   });
