@@ -1,4 +1,11 @@
-import { createPlant, deletePlant, getAllPlants, getPlantById, updatePlant } from "../services/plantService.js";
+import {
+  createPlant,
+  deletePlant,
+  getAllPlants,
+  getPlantById,
+  updatePlant,
+} from "../services/plantService.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const getAll = async (req, res) => {
   try {
@@ -23,6 +30,7 @@ export const getById = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
 
 export const create = async (req, res) => {
   try {
