@@ -38,6 +38,7 @@ export const updateCart = async (id, qty) => {
   return update;
 };
 
+
 export const deleteItemCart = async (cartId, userId) => {
   // 1️. Pastikan cart milik user
   const cart = await prisma.cart.findFirst({
@@ -58,6 +59,7 @@ export const deleteItemCart = async (cartId, userId) => {
     where: { id: cartId },
   });
 };
+
 
 export const getCartById = async (userId) => {
   // 1. ambil cart user
@@ -92,6 +94,7 @@ export const getCartById = async (userId) => {
       id: item.id,
       plantId: item.plantId,
       nama: plant?.nama,
+      gambar: plant?.gambar,
       harga: plant?.harga,
       qty: item.qty,
       total: item.qty * (plant?.harga || 0),
