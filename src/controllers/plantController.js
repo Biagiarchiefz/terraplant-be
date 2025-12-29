@@ -74,6 +74,7 @@ export const create = async (req, res) => {
   }
 };
 
+
 export const update = async (req, res) => {
   try {
     const { nama, harga, deskripsi, kategori, stok } = req.body;
@@ -109,6 +110,7 @@ export const update = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
+
 
 export const remove = async (req, res) => {
   try {
