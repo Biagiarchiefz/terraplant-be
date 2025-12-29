@@ -1,6 +1,12 @@
 import express from "express";
 import { authMiddleware } from "../middlewares/authMiddleware.js";
-import { create, getAll, getById, remove, update } from "../controllers/plantController.js";
+import {
+  create,
+  getAll,
+  getById,
+  remove,
+  update,
+} from "../controllers/plantController.js";
 import { upload } from "../middlewares/uploadMiddleware.js";
 
 const router = express.Router();
