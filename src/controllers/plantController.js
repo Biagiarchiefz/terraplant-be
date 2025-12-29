@@ -1,4 +1,11 @@
-import { createPlant, deletePlant, getAllPlants, getPlantById, updatePlant } from "../services/plantService.js";
+import {
+  createPlant,
+  deletePlant,
+  getAllPlants,
+  getPlantById,
+  updatePlant,
+} from "../services/plantService.js";
+import cloudinary from "../utils/cloudinary.js";
 
 export const getAll = async (req, res) => {
   try {
@@ -24,12 +31,43 @@ export const getById = async (req, res) => {
   }
 };
 
+
 export const create = async (req, res) => {
   try {
-    const data = await createPlant(req.body);
+    const { nama, harga, deskripsi, kategori, stok } = req.body;
+
+    if (!nama || !harga || !kategori || !stok) {
+      return res.status(400).json({ message: "Field wajib tidak lengkap" });
+    }
+
+    let imageUrls = [];
+
+    // upload gambar jika ada
+    if (req.file?.buffer) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "plants" }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          })
+          .end(req.file.buffer);
+      });
+
+      imageUrls.push(uploadResult.secure_url);
+    }
+
+    const plant = await createPlant({
+      nama,
+      harga,
+      deskripsi,
+      kategori,
+      stok,
+      gambar: imageUrls,
+    });
+
     res.status(201).json({
       message: "Tanaman berhasil ditambahkan",
-      data: data,
+      data: plant,
     });
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -38,7 +76,31 @@ export const create = async (req, res) => {
 
 export const update = async (req, res) => {
   try {
-    const data = await updatePlant(req.params.id, req.body);
+    const { nama, harga, deskripsi, kategori, stok } = req.body;
+
+    let updateData = {
+      nama,
+      harga,
+      deskripsi,
+      kategori,
+      stok,
+    };
+
+    // Upload gambar baru jika ada
+    if (req.file?.buffer) {
+      const uploadResult = await new Promise((resolve, reject) => {
+        cloudinary.uploader
+          .upload_stream({ folder: "plants" }, (err, result) => {
+            if (err) reject(err);
+            else resolve(result);
+          })
+          .end(req.file.buffer);
+      });
+
+      updateData.gambar = [uploadResult.secure_url];
+    }
+
+    const data = await updatePlant(req.params.id, updateData);
     res.json({
       message: "Tanaman berhasil diperbarui",
       data: data,

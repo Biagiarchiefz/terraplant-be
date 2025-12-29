@@ -13,20 +13,23 @@ export const getPlantById = async (id) => {
 
 export const createPlant = async (data) => {
   const { nama, harga, deskripsi, kategori, stok, gambar } = data;
+
   const slug = await generateUniqueSlug(nama);
 
   return await prisma.plant.create({
     data: {
-      nama: nama,
-      slug: slug,
+      nama,
+      slug,
       harga: parseInt(harga),
-      deskripsi: deskripsi,
-      kategori: kategori,
+      deskripsi,
+      kategori,
       stok: parseInt(stok),
       gambar: Array.isArray(gambar) ? gambar : [],
     },
   });
 };
+
+
 
 export const updatePlant = async (id, data) => {
   const { nama, harga, deskripsi, kategori, stok, rating, gambar } = data;

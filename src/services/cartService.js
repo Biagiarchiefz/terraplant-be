@@ -59,6 +59,9 @@ export const deleteItemCart = async (cartId, userId) => {
   });
 };
 
+
+
+
 export const getCartById = async (userId) => {
   // 1. ambil cart user
   // ambil semua isi keranjang milik user ini
@@ -92,6 +95,7 @@ export const getCartById = async (userId) => {
       id: item.id,
       plantId: item.plantId,
       nama: plant?.nama,
+      gambar: plant?.gambar,
       harga: plant?.harga,
       qty: item.qty,
       total: item.qty * (plant?.harga || 0),
