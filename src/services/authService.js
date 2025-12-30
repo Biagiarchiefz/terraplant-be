@@ -2,7 +2,6 @@ import { prisma } from "../config/prismaConfig.js";
 import bcrypt from "bcryptjs";
 import { generateToken } from "../utils/jwt.js";
 
-
 export const registerService = async (data) => {
   const { nama, email, password } = data;
 
@@ -25,7 +24,6 @@ export const registerService = async (data) => {
   return user;
 };
 
-
 export const loginService = async (data) => {
   const { email, password } = data;
 
@@ -47,7 +45,6 @@ export const loginService = async (data) => {
   return { user, token };
 };
 
-
 export const profileService = async (userId) => {
   const user = await prisma.user.findUnique({
     where: {
@@ -64,4 +61,28 @@ export const profileService = async (userId) => {
   });
 
   return user;
+};
+
+export const googleLoginService = async (googlePayload) => {
+  const { email, name, sub: googleId } = googlePayload;
+
+  // Cek apakah user sudah terdaftar
+  let user = await prisma.user.findUnique({
+    where: { email },
+  });
+
+  // Jika belum terdaftar, buat user baru
+  if (!user) {
+    user = await prisma.user.create({
+      data: {
+        nama: name,
+        email,
+        password: await bcrypt.hash(googleId, 10), // password dummy dari googleId
+      },
+    });
+  }
+
+  const token = generateToken(user);
+
+  return { user, token };
 };

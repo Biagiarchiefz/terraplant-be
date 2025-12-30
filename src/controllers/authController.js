@@ -1,13 +1,25 @@
 import * as yup from "yup";
 
-import { loginService, profileService, registerService } from "../services/authService.js";
+import {
+  loginService,
+  profileService,
+  registerService,
+  googleLoginService,
+} from "../services/authService.js";
+import { verifyGoogleToken } from "../utils/googleConfig.js";
 
 export const registerSchema = yup.object({
-  nama: yup.string().min(3, "Nama minimal 3 karakter").required("Nama wajib diisi"),
+  nama: yup
+    .string()
+    .min(3, "Nama minimal 3 karakter")
+    .required("Nama wajib diisi"),
 
   email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
 
-  password: yup.string().min(6, "Password minimal 6 karakter").required("Password wajib diisi"),
+  password: yup
+    .string()
+    .min(6, "Password minimal 6 karakter")
+    .required("Password wajib diisi"),
 
   confirmPassword: yup
     .string()
@@ -18,7 +30,10 @@ export const registerSchema = yup.object({
 export const loginSchema = yup.object({
   email: yup.string().email("Email tidak valid").required("Email wajib diisi"),
 
-  password: yup.string().min(6, "Password minimal 6 karakter").required("Password wajib diisi"),
+  password: yup
+    .string()
+    .min(6, "Password minimal 6 karakter")
+    .required("Password wajib diisi"),
 });
 
 export const register = async (req, res) => {
@@ -69,5 +84,29 @@ export const me = async (req, res) => {
     });
   } catch (err) {
     throw new Error(err.message);
+  }
+};
+
+export const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    if (!token) {
+      return res.status(400).json({ error: "Token Google wajib diisi" });
+    }
+
+    // Verifikasi token Google
+    const googlePayload = await verifyGoogleToken(token);
+
+    // Proses login dengan data Google
+    const { user, token: jwtToken } = await googleLoginService(googlePayload);
+
+    res.status(200).json({
+      message: "Google login success",
+      data: user,
+      token: jwtToken,
+    });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
   }
 };
