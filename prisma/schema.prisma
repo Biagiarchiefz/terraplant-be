@@ -17,13 +17,14 @@ model User {
   id           String   @id @default(auto()) @map("_id") @db.ObjectId
   nama         String
   email        String   @unique
-  password     String
+  password     String?
   alamat       String?
   no_hp        String?
   role         Role     @default(user)
   foto_profile String?  @default("user.jpg")
   created_at   DateTime @default(now())
   updated_at   DateTime @updatedAt
+  googleId     String?  @unique
 }
 
 enum Role {
@@ -55,32 +56,30 @@ model Cart {
 }
 
 model Order {
-  id          String   @id @default(auto()) @map("_id") @db.ObjectId
-  userId      String   @db.ObjectId
+  id     String @id @default(auto()) @map("_id") @db.ObjectId
+  userId String @db.ObjectId
 
-  fullName    String
-  address     String
-  city        String
-  state       String
-  zipCode     String
-  phone       String
+  fullName String
+  address  String
+  city     String
+  state    String
+  zipCode  String
+  phone    String
 
   paymentMethod String
-  status      OrderStatus
-  totalHarga  Int
+  status        OrderStatus
+  totalHarga    Int
 
-  created_at  DateTime @default(now())
+  created_at DateTime @default(now())
 }
-
 
 enum OrderStatus {
-  pembayaran   // user baru checkout
-  diproses     // admin konfirmasi
-  dikirim      // admin kirim barang
-  selesai      // user konfirmasi terima
+  pembayaran // user baru checkout
+  diproses // admin konfirmasi
+  dikirim // admin kirim barang
+  selesai // user konfirmasi terima
   dibatalkan
 }
-
 
 model OrderItem {
   id      String @id @default(auto()) @map("_id") @db.ObjectId
@@ -89,5 +88,5 @@ model OrderItem {
   nama    String
   harga   Int
   qty     Int
-  gambar String
+  gambar  String
 }
