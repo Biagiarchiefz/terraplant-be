@@ -1,17 +1,28 @@
-import { OAuth2Client } from "google-auth-library";
-
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
-
-const client = new OAuth2Client(GOOGLE_CLIENT_ID);
-
-export const verifyGoogleToken = async (token) => {
+export const verifyGoogleToken = async (accessToken) => {
   try {
-    const ticket = await client.verifyIdToken({
-      idToken: token,
-      audience: GOOGLE_CLIENT_ID,
-    });
-    const payload = ticket.getPayload();
-    return payload;
+    // Menggunakan access token untuk mendapatkan user info dari Google
+    const response = await fetch(
+      `https://www.googleapis.com/oauth2/v3/userinfo`,
+      {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch user info from Google");
+    }
+
+    const userInfo = await response.json();
+
+    // Format payload agar sesuai dengan struktur yang diharapkan
+    return {
+      email: userInfo.email,
+      name: userInfo.name,
+      sub: userInfo.sub,
+      picture: userInfo.picture,
+    };
   } catch (error) {
     throw new Error("Invalid Google token");
   }
