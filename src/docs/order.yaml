@@ -1,44 +1,42 @@
 tags:
-  - name: Admin Order
-    description: API Manajemen Pesanan khusus Admin
+  - name: Order
+    description: Order History and Detail API
 
 paths:
-  /api/admin/orders:
+  /api/orders:
     get:
       tags:
-        - Admin Order
-      summary: Ambil semua data pesanan (Admin Only)
-      description: Mengambil daftar semua pesanan dari semua user dengan format ringkasan untuk dashboard admin.
+        - Order
+      summary: Ambil riwayat pesanan user
+      description: Mengambil semua daftar pesanan milik user yang sedang login dengan ringkasan item (preview).
       security:
         - bearerAuth: []
       responses:
         200:
-          description: Berhasil mengambil data order
+          description: get all order success
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  success:
-                    type: boolean
-                    example: true
+                  message:
+                    type: string
+                    example: "get all order success"
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/AdminOrderResponse"
+                      $ref: "#/components/schemas/OrderSummary"
+        400:
+          description: Bad Request
         401:
           description: Unauthorized
-        403:
-          description: Access denied (Bukan admin)
-        500:
-          description: Gagal mengambil data order
 
-  /api/admin/orders/{id}:
+  /api/orders/{id}:
     get:
       tags:
-        - Admin Order
-      summary: Ambil detail pesanan user (Admin Only)
-      description: Mengambil detail lengkap satu pesanan termasuk alamat, kurir dummy, dan daftar item produk.
+        - Order
+      summary: Ambil detail pesanan berdasarkan ID
+      description: Mengambil informasi lengkap pesanan termasuk alamat, kurir dummy, daftar item, dan rincian harga.
       security:
         - bearerAuth: []
       parameters:
@@ -50,7 +48,7 @@ paths:
           description: ID Pesanan (Order ID)
       responses:
         200:
-          description: Berhasil mengambil detail order user
+          description: get detail order success
           content:
             application/json:
               schema:
@@ -58,18 +56,18 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "berhasil mengambil detail order user"
+                    example: "get detail order success"
                   data:
-                    $ref: "#/components/schemas/AdminOrderDetail"
+                    $ref: "#/components/schemas/OrderDetail"
         404:
           description: Order tidak ditemukan
 
-  /api/admin/orders/{id}/status:
+  /api/orders/{id}/complete:
     patch:
       tags:
-        - Admin Order
-      summary: Memperbarui status pesanan
-      description: Admin hanya boleh mengubah status ke 'diproses' atau 'dikirim'.
+        - Order
+      summary: Selesaikan pesanan (Konfirmasi Terima)
+      description: Mengubah status order menjadi 'selesai'. Hanya bisa dilakukan jika status saat ini adalah 'dikirim'.
       security:
         - bearerAuth: []
       parameters:
@@ -78,23 +76,9 @@ paths:
           required: true
           schema:
             type: string
-          description: ID Pesanan
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - status
-              properties:
-                status:
-                  type: string
-                  enum: [diproses, dikirim]
-                  example: "dikirim"
       responses:
         200:
-          description: status berhasil diubah
+          description: update statu complate order succes
           content:
             application/json:
               schema:
@@ -102,11 +86,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "status berhasil diubah"
+                    example: "update statu complate order succes"
                   data:
-                    $ref: "#/components/schemas/Order"
-        400:
-          description: Status tidak valid atau bad request
+                    $ref: "#/components/schemas/OrderRaw"
+        404:
+          description: Order tidak ditemukan atau status belum 'dikirim'
 
 components:
   securitySchemes:
@@ -116,26 +100,33 @@ components:
       bearerFormat: JWT
 
   schemas:
-    AdminOrderResponse:
+    OrderSummary:
       type: object
       properties:
-        orderId:
+        id:
           type: string
-        customer:
-          type: string
-          example: "Riki Rikandi"
-        date:
+        created_at:
           type: string
           format: date-time
-        total:
-          type: integer
-        itemCount:
-          type: integer
         status:
           type: string
-          example: "diproses"
+          enum: [pembayaran, diproses, dikirim, selesai, dibatalkan]
+        totalHarga:
+          type: integer
+        totalItem:
+          type: integer
+        preview:
+          type: object
+          nullable: true
+          properties:
+            nama:
+              type: string
+              example: "Aglaonema +2 lainnya"
+            gambar:
+              type: string
+              example: "plant-image.jpg"
 
-    AdminOrderDetail:
+    OrderDetail:
       type: object
       properties:
         id:
@@ -155,12 +146,12 @@ components:
               type: string
             address:
               type: string
+              example: "Jl. Merdeka No 1, Jakarta, DKI Jakarta 12345"
             courier:
               type: object
               properties:
                 name:
                   type: string
-                  example: "JNE Regular"
                 resi:
                   type: string
                 estimate:
@@ -176,6 +167,8 @@ components:
               type: integer
             ongkir:
               type: integer
+            diskonOngkir:
+              type: integer
             total:
               type: integer
 
@@ -183,6 +176,10 @@ components:
       type: object
       properties:
         id:
+          type: string
+        orderId:
+          type: string
+        plantId:
           type: string
         nama:
           type: string
@@ -193,7 +190,7 @@ components:
         gambar:
           type: string
 
-    Order:
+    OrderRaw:
       type: object
       properties:
         id:
