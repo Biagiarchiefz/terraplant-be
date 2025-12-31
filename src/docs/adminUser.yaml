@@ -1,0 +1,148 @@
+tags:
+  - name: Admin User
+    description: API Manajemen User khusus Admin (RBAC)
+
+paths:
+  /api/admin/users:
+    get:
+      tags:
+        - Admin Order
+      summary: Ambil semua data user (Admin Only)
+      description: Mengambil daftar lengkap user terdaftar. Data sensitif seperti password disembunyikan.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: get all user success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "get all user success"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/UserAdminView"
+        401:
+          description: Unauthorized
+        403:
+          description: Access denied. Admin only.
+        500:
+          description: Gagal mengambil data user
+
+  /api/admin/users/{id}/role:
+    patch:
+      tags:
+        - Admin User
+      summary: Memperbarui Role User
+      description: Mengubah hak akses user (misal dari 'user' menjadi 'admin').
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID User yang akan diubah rolenya
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - role
+              properties:
+                role:
+                  type: string
+                  enum: [admin, user]
+                  example: "admin"
+      responses:
+        200:
+          description: role user berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "role user berhasil diupdate"
+                  data:
+                    $ref: "#/components/schemas/UserAdminView"
+        400:
+          description: Role wajib diisi atau user tidak ditemukan
+
+  /api/admin/users/{id}:
+    delete:
+      tags:
+        - Admin User
+      summary: Menghapus User (Admin Only)
+      description: Menghapus akun user berdasarkan ID. Admin tidak diizinkan menghapus akun mereka sendiri.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID User yang akan dihapus
+      responses:
+        200:
+          description: delete user success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "delete user success"
+        400:
+          description: Admin tidak boleh menghapus akunnya sendiri
+        500:
+          description: Gagal delete user
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    UserAdminView:
+      type: object
+      properties:
+        id:
+          type: string
+          example: "658bc..."
+        nama:
+          type: string
+          example: "Marchiko"
+        email:
+          type: string
+          example: "marchiko@email.com"
+        alamat:
+          type: string
+          nullable: true
+          example: "Jl. Jakarta No. 10"
+        no_hp:
+          type: string
+          nullable: true
+          example: "08123456789"
+        role:
+          type: string
+          enum: [admin, user]
+          example: "user"
+        updated_at:
+          type: string
+          format: date-time

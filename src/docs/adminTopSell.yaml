@@ -1,0 +1,62 @@
+tags:
+  - name: Admin Dashboard
+    description: API untuk data analitik dashboard Admin
+
+paths:
+  /api/admin/top-selling:
+    get:
+      tags:
+        - Admin Dashboard
+      summary: Ambil daftar tanaman terlaris (Admin Only)
+      description: Mengambil 5 tanaman dengan jumlah penjualan terbanyak berdasarkan pesanan yang sudah berstatus 'selesai'.
+      security:
+        - bearerAuth: []
+      responses:
+        200:
+          description: Berhasil mengambil tanaman terlaris
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Berhasil mengambil tanaman terlaris"
+                  data:
+                    type: array
+                    nullable: true
+                    items:
+                      $ref: "#/components/schemas/TopSellingPlant"
+        401:
+          description: Unauthorized (Token tidak valid)
+        403:
+          description: Access denied (Bukan admin)
+        500:
+          description: Gagal mengambil tanaman terlaris
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    TopSellingPlant:
+      type: object
+      properties:
+        plantId:
+          type: string
+          example: "658bc..."
+        nama:
+          type: string
+          example: "Monstera Deliciosa"
+        totalTerjual:
+          type: integer
+          example: 25
+        totalPendapatan:
+          type: integer
+          example: 1250000

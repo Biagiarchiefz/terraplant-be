@@ -1,6 +1,6 @@
 tags:
   - name: Cart
-    description: Cart Management API
+    description: Cart Management API (Add, Update, Get, Delete)
 
 paths:
   /api/cart/add:
@@ -8,6 +8,7 @@ paths:
       tags:
         - Cart
       summary: Menambahkan Tanaman ke Keranjang
+      description: Menambahkan item baru atau menambah qty jika item sudah ada di keranjang.
       security:
         - bearerAuth: []
       requestBody:
@@ -37,6 +38,7 @@ paths:
       tags:
         - Cart
       summary: Ambil semua isi keranjang milik user
+      description: Mengambil daftar item lengkap dengan detail tanaman, gambar, dan grand total.
       security:
         - bearerAuth: []
       parameters:
@@ -45,7 +47,7 @@ paths:
           required: true
           schema:
             type: string
-          example: "user_id_123"
+          example: "694f6961d1796521647fc0fe"
       responses:
         200:
           description: Get cart success
@@ -75,13 +77,15 @@ paths:
           required: true
           schema:
             type: string
-          description: ID dari item di keranjang
+          description: ID unik dari record Cart (bukan plantId)
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
+              required:
+                - qty
               properties:
                 qty:
                   type: integer
@@ -114,9 +118,10 @@ paths:
           required: true
           schema:
             type: string
+          description: ID unik dari record Cart
       responses:
         200:
-          description: Item berhasil dihapus dari cart
+          description: item berhasil dihapus dari cart
           content:
             application/json:
               schema:
@@ -144,7 +149,7 @@ components:
       properties:
         plantId:
           type: string
-          example: "contoh123"
+          example: "694dfd701cdb366ddf1ca472"
         qty:
           type: integer
           example: 2
@@ -154,13 +159,13 @@ components:
       properties:
         id:
           type: string
-          example: "cartid01"
+          example: "694f6e0677b6b0dfb01fb14a"
         userId:
           type: string
-          example: "userid123"
+          example: "694f6961d1796521647fc0fe"
         plantId:
           type: string
-          example: "plantidabc"
+          example: "694dfd701cdb366ddf1ca472"
         qty:
           type: integer
           example: 2
@@ -170,22 +175,27 @@ components:
       properties:
         id:
           type: string
-          example: "cartid01"
+          example: "694f6e0677b6b0dfb01fb14a"
         plantId:
           type: string
-          example: "plantidabc"
+          example: "694dfd701cdb366ddf1ca472"
         nama:
           type: string
-          example: "Monstera"
+          example: "Melati"
+        gambar:
+          type: array
+          items:
+            type: string
+          example: ["melati.jpg"]
         harga:
           type: integer
-          example: 50000
+          example: 33333
         qty:
           type: integer
           example: 2
         total:
           type: integer
-          example: 100000
+          example: 66666
 
     CartResponse:
       type: object
@@ -196,4 +206,4 @@ components:
             $ref: "#/components/schemas/CartItemDetail"
         grandTotal:
           type: integer
-          example: 100000
+          example: 66666
