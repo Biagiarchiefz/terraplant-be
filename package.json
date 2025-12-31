@@ -22,6 +22,7 @@
     "express": "^4.22.1",
     "google-auth-library": "^10.5.0",
     "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.4.3",
     "mongoose": "^9.0.0",
     "multer": "^2.0.2",
     "swagger-jsdoc": "^6.2.8",

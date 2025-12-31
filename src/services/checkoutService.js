@@ -1,4 +1,5 @@
 import { prisma } from "../config/prismaConfig.js";
+import { createTransaction } from "./midtransService.js";
 
 export const checkoutPlant = async (userId, checkoutData) => {
   const { fullName, address, city, state, zipCode, phone, paymentMethod } =
@@ -12,6 +13,11 @@ export const checkoutPlant = async (userId, checkoutData) => {
   if (carts.length === 0) {
     throw new Error("Cart kosong");
   }
+
+  // Ambil data user untuk email
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
 
   // 2️. Ambil plant
   const plantIds = carts.map((c) => c.plantId);
@@ -39,7 +45,7 @@ export const checkoutPlant = async (userId, checkoutData) => {
     };
   });
 
-  // 4️. Buat Order
+  // 4️. Buat Order dengan status pembayaran
   const order = await prisma.order.create({
     data: {
       userId,
@@ -50,7 +56,7 @@ export const checkoutPlant = async (userId, checkoutData) => {
       zipCode,
       phone,
       paymentMethod,
-      status: "diproses",
+      status: "diproses", // set status diproses setelah melakukan pemabayaran
       totalHarga,
     },
   });
@@ -63,10 +69,40 @@ export const checkoutPlant = async (userId, checkoutData) => {
     })),
   });
 
-  // 6️. Kosongkan Cart
+  // 6. Generate Midtrans payment token
+  const itemDetails = orderItemsData.map((item) => ({
+    id: item.plantId,
+    price: item.harga,
+    quantity: item.qty,
+    name: item.nama,
+  }));
+
+  const paymentData = await createTransaction({
+    orderId: order.id,
+    totalHarga,
+    fullName,
+    email: user.email,
+    phone,
+    itemDetails,
+  });
+
+  // 7️. Kosongkan Cart setelah order dibuat
   await prisma.cart.deleteMany({
     where: { userId },
   });
 
-  return order.id;
+  return {
+    orderId: order.id,
+    paymentToken: paymentData.token,
+    redirectUrl: paymentData.redirect_url,
+  };
+};
+
+
+
+export const updateOrderStatus = async (orderId, status) => {
+  return await prisma.order.update({
+    where: { id: orderId },
+    data: { status },
+  });
 };
