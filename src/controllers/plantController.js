@@ -31,7 +31,6 @@ export const getById = async (req, res) => {
   }
 };
 
-
 export const create = async (req, res) => {
   try {
     const { nama, harga, deskripsi, kategori, stok } = req.body;
@@ -74,10 +73,15 @@ export const create = async (req, res) => {
   }
 };
 
-
 export const update = async (req, res) => {
   try {
     const { nama, harga, deskripsi, kategori, stok } = req.body;
+
+    // Ambil data plant yang sudah ada
+    const existingPlant = await getPlantById(req.params.id);
+    if (!existingPlant) {
+      return res.status(404).json({ message: "Plant not found" });
+    }
 
     let updateData = {
       nama,
@@ -85,6 +89,7 @@ export const update = async (req, res) => {
       deskripsi,
       kategori,
       stok,
+      gambar: existingPlant.gambar, // gunakan gambar lama sebagai default
     };
 
     // Upload gambar baru jika ada
@@ -110,7 +115,6 @@ export const update = async (req, res) => {
     res.status(400).json({ message: err.message });
   }
 };
-
 
 export const remove = async (req, res) => {
   try {
