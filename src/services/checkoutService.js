@@ -19,13 +19,20 @@ export const checkoutPlant = async (userId, checkoutData) => {
     where: { id: { in: plantIds } },
   });
 
-  // 3️. Hitung total
+  // 3️. Validasi stok dan hitung total
   let totalHarga = 0;
 
   const orderItemsData = carts.map((cart) => {
     const plant = plants.find((p) => p.id === cart.plantId);
 
     if (!plant) throw new Error("Produk tidak ditemukan");
+
+    // Validasi stok
+    if (plant.stok < cart.qty) {
+      throw new Error(
+        `Stok ${plant.nama} tidak mencukupi`
+      );
+    }
 
     const subtotal = plant.harga * cart.qty;
     totalHarga += subtotal;
@@ -39,34 +46,51 @@ export const checkoutPlant = async (userId, checkoutData) => {
     };
   });
 
-  // 4️. Buat Order
-  const order = await prisma.order.create({
-    data: {
-      userId,
-      fullName,
-      address,
-      city,
-      state,
-      zipCode,
-      phone,
-      paymentMethod,
-      status: "diproses",
-      totalHarga,
-    },
+  // 4️. Gunakan transaction untuk atomicity
+  const result = await prisma.$transaction(async (tx) => {
+    // Buat Order
+    const order = await tx.order.create({
+      data: {
+        userId,
+        fullName,
+        address,
+        city,
+        state,
+        zipCode,
+        phone,
+        paymentMethod,
+        status: "diproses",
+        totalHarga,
+      },
+    });
+
+    // Buat OrderItem
+    await tx.orderItem.createMany({
+      data: orderItemsData.map((item) => ({
+        ...item,
+        orderId: order.id,
+      })),
+    });
+
+    // Update stok tanaman
+    for (const cart of carts) {
+      await tx.plant.update({
+        where: { id: cart.plantId },
+        data: {
+          stok: {
+            decrement: cart.qty,
+          },
+        },
+      });
+    }
+
+    // Kosongkan Cart
+    await tx.cart.deleteMany({
+      where: { userId },
+    });
+
+    return order.id;
   });
 
-  // 5️. Buat OrderItem
-  await prisma.orderItem.createMany({
-    data: orderItemsData.map((item) => ({
-      ...item,
-      orderId: order.id,
-    })),
-  });
-
-  // 6️. Kosongkan Cart
-  await prisma.cart.deleteMany({
-    where: { userId },
-  });
-
-  return order.id;
+  return result;
 };

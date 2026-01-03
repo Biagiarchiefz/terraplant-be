@@ -80,7 +80,7 @@ export const update = async (req, res) => {
     // Ambil data plant yang sudah ada
     const existingPlant = await getPlantById(req.params.id);
     if (!existingPlant) {
-      return res.status(404).json({ message: "Plant not found" });
+      return res.status(404).json({ message: "Tanaman tidak ditemukan" });
     }
 
     let updateData = {
