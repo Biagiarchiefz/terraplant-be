@@ -27,7 +27,7 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: marchiko@email.com
+                  example: marchiko@gmail.com
                 password:
                   type: string
                   minLength: 6
@@ -68,7 +68,7 @@ paths:
               properties:
                 email:
                   type: string
-                  example: marchiko@email.com
+                  example: marchiko@gmail.com
                 password:
                   type: string
                   example: password123
@@ -164,7 +164,7 @@ components:
           example: "marchiko"
         email:
           type: string
-          example: "marchiko@email.com"
+          example: "marchiko@gmail.com"
         role:
           type: string
           example: "user"
