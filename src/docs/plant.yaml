@@ -1,6 +1,6 @@
 tags:
   - name: Plant
-    description: Plant CRUD API
+    description: Plant CRUD API management
 
 paths:
   /api/plants:
@@ -8,8 +8,7 @@ paths:
       tags:
         - Plant
       summary: Ambil semua tanaman
-      security:
-        - bearerAuth: []
+      # Tidak ada security bearerAuth di route GET / menurut plantRoute.js Anda
       responses:
         200:
           description: Berhasil mengambil semua data tanaman
@@ -21,22 +20,39 @@ paths:
                   message:
                     type: string
                     example: "Berhasil mengambil semua data tanaman"
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Plant"
         500:
           description: Internal Server Error
 
-  /api/plants/:
     post:
       tags:
         - Plant
-      summary: Menambahkan Tanaman Baru
+      summary: Menambahkan Tanaman Baru (Admin Only)
       security:
         - bearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data: # Menggunakan form-data karena ada upload file
             schema:
-              $ref: "#/components/schemas/PlantInput"
+              type: object
+              properties:
+                nama:
+                  type: string
+                harga:
+                  type: integer
+                deskripsi:
+                  type: string
+                kategori:
+                  type: string
+                stok:
+                  type: integer
+                gambar: # Field untuk file upload
+                  type: string
+                  format: binary
       responses:
         201:
           description: Tanaman berhasil ditambahkan
@@ -47,11 +63,13 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Tanaman berhasil ditambahkan
+                    example: "Tanaman berhasil ditambahkan"
                   data:
                     $ref: "#/components/schemas/Plant"
         400:
-          description: Bad Request / Kesalahan validasi input
+          description: Field wajib tidak lengkap / Error validasi
+        401:
+          description: Unauthorized (Token tidak valid/tidak ada)
 
   /api/plants/{id}:
     get:
@@ -66,6 +84,7 @@ paths:
           required: true
           schema:
             type: string
+          example: "658bc..."
       responses:
         200:
           description: Detail tanaman ditemukan
@@ -75,8 +94,6 @@ paths:
                 $ref: "#/components/schemas/Plant"
         404:
           description: Plant not found
-        500:
-          description: Internal Server Error
 
     put:
       tags:
@@ -93,9 +110,23 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data: # Tetap multipart karena bisa update gambar
             schema:
-              $ref: "#/components/schemas/PlantInput"
+              type: object
+              properties:
+                nama:
+                  type: string
+                harga:
+                  type: integer
+                deskripsi:
+                  type: string
+                kategori:
+                  type: string
+                stok:
+                  type: integer
+                gambar:
+                  type: string
+                  format: binary
       responses:
         200:
           description: Tanaman berhasil diperbarui
@@ -106,11 +137,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Tanaman berhasil diperbarui
+                    example: "Tanaman berhasil diperbarui"
                   data:
                     $ref: "#/components/schemas/Plant"
-        404:
-          description: Plant not found
 
     delete:
       tags:
@@ -134,9 +163,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Tanaman berhasil dihapus
-        400:
-          description: Kesalahan saat menghapus
+                    example: "Tanaman berhasil dihapus"
 
 components:
   securitySchemes:
@@ -146,45 +173,41 @@ components:
       bearerFormat: JWT
 
   schemas:
-    PlantInput:
+    Plant:
       type: object
-      required:
-        - nama
-        - harga
-        - stok
       properties:
+        id:
+          type: string
+          example: "60d5ecb3ed234a5d8c1e956a"
         nama:
           type: string
-          example: "Monstera"
+          example: "Bunga Matahari"
         slug:
           type: string
-          example: "monstera-deliciosa"
+          example: "bunga-matahari"
         harga:
           type: integer
-          example: 50000
+          example: 25000
         deskripsi:
           type: string
-          example: "Tanaman hias daun"
+          example: "Tanaman hias cantik"
         kategori:
           type: string
-          example: "Indoor"
+          example: "Outdoor"
         stok:
           type: integer
-          example: 10
+          example: 50
+        rating:
+          type: number
+          example: 4.5
         gambar:
           type: array
           items:
             type: string
-          example: ["image1.jpg"]
-
-    Plant:
-      allOf:
-        - type: object
-          properties:
-            id:
-              type: string
-              example: "id12"
-            rating:
-              type: number
-              example: 0
-        - $ref: "#/components/schemas/PlantInput"
+          example: ["https://cloudinary.com/image1.jpg"]
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time

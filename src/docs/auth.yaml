@@ -1,6 +1,6 @@
 tags:
   - name: Auth
-    description: Authentication API
+    description: Authentication API (Register, Login, Google OAuth, Profile)
 
 paths:
   /api/auth/register:
@@ -22,28 +22,40 @@ paths:
               properties:
                 nama:
                   type: string
+                  minLength: 3
                   example: marchiko
                 email:
                   type: string
-                  example: marchiko@email.com
+                  format: email
+                  example: marchiko@gmail.com
                 password:
                   type: string
+                  minLength: 6
                   example: password123
                 confirmPassword:
                   type: string
                   example: password123
-
       responses:
         201:
-          description: User berhasil dibuat
+          description: Register success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Register success"
+                  user:
+                    $ref: "#/components/schemas/User"
         400:
-          description: Validasi gagal
+          description: Validasi gagal (Password tidak cocok, email terdaftar, dll)
 
   /api/auth/login:
     post:
       tags:
         - Auth
-      summary: Login user
+      summary: Login user manual
       requestBody:
         required: true
         content:
@@ -56,22 +68,71 @@ paths:
               properties:
                 email:
                   type: string
-                  example: marchiko@email.com
+                  example: marchiko@gmail.com
                 password:
                   type: string
                   example: password123
       responses:
         200:
-          description: Login berhasil
-        401:
-          description: Email atau password salah
+          description: Login success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login success"
+                  data:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+                    example: "eyJhbGciOiJIUzI1Ni..."
+        400:
+          description: Email tidak ditemukan atau Password salah
+
+  /api/auth/google-login:
+    post:
+      tags:
+        - Auth
+      summary: Login via Google OAuth
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: ID Token yang didapat dari Google SDK (frontend)
+                  example: "G-OAUTH-TOKEN-STRING"
+      responses:
+        200:
+          description: Google login success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Google login success"
+                  data:
+                    $ref: "#/components/schemas/User"
+                  token:
+                    type: string
+        400:
+          description: Token Google wajib diisi atau tidak valid
 
   /api/auth/me:
     get:
       tags:
         - Auth
-      summary: Get profile user
-      description: Mengembalikan data profil user berdasarkan token JWT yang dikirim di header Authorization.
+      summary: Get profile user (Protected)
+      description: Mengambil data profil user berdasarkan JWT.
       security:
         - bearerAuth: []
       responses:
@@ -84,9 +145,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "success get profile user"
+                    example: "succes get profile user"
+                  data:
+                    $ref: "#/components/schemas/User"
         401:
-          description: invalid token
+          description: Unauthorized (Invalid or Missing Token)
 
 components:
   schemas:
@@ -95,20 +158,20 @@ components:
       properties:
         id:
           type: string
-          example: 6938f9e0b3a80839bf8b8adb
+          example: "6938f9e0b3a80839bf8b8adb"
         nama:
           type: string
-          example: marchiko
+          example: "marchiko"
         email:
           type: string
-          example: marchiko@email.com
+          example: "marchiko@gmail.com"
         role:
           type: string
-          example: user
+          example: "user"
         created_at:
           type: string
           format: date-time
-          example: 2025-12-10T04:41:04.757Z
+          example: "2025-12-10T04:41:04.757Z"
 
   securitySchemes:
     bearerAuth:
